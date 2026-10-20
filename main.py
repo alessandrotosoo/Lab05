@@ -37,6 +37,26 @@ def main(page: ft.Page):
 
     # Tutti i TextField per le info necessarie per aggiungere un nuovo strumento (tipo, marca, anno, contatore posti)
     # TODO
+    testo_tipo = ft.TextField('tipo strummento')
+    testo_marca = ft.TextField('marca strummento')
+    testo_anno = ft.TextField('anno strummento')
+    testo_meno = ft.IconButton(
+        icon=ft.Icons.REMOVE,
+        icon_color=ft.Colors.RED,
+        #on_click=decrementa_click
+    )
+
+    testo_piu = ft.IconButton(
+        icon=ft.Icons.ADD,
+        icon_color=ft.Colors.GREEN,
+        #on_click=incrementa_click
+    )
+    riga_testo_inserimento_strumento = ft.Row([testo_tipo, testo_marca, testo_anno,testo_meno, testo_piu])
+    page.controls.append(riga_testo_inserimento_strumento)
+
+    page.update()
+
+
 
     # --- FUNZIONI APP ---
     def aggiorna_lista_strumenti():
