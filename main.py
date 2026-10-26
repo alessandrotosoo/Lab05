@@ -6,7 +6,7 @@ FILE_STRUMENTI = "strumenti.csv"
 
 def main(page: ft.Page):
     page.title = "Lab05"
-    page.horizontal_alignment = "center"
+    page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
     page.theme_mode = ft.ThemeMode.DARK
 
     # --- ALERT ---
@@ -37,26 +37,10 @@ def main(page: ft.Page):
 
     # Tutti i TextField per le info necessarie per aggiungere un nuovo strumento (tipo, marca, anno, contatore posti)
     # TODO
-    testo_tipo = ft.TextField('tipo strummento')
-    testo_marca = ft.TextField('marca strummento')
-    testo_anno = ft.TextField('anno strummento')
-    testo_meno = ft.IconButton(
-        icon=ft.Icons.REMOVE,
-        icon_color=ft.Colors.RED,
-        #on_click=decrementa_click
-    )
-
-    testo_piu = ft.IconButton(
-        icon=ft.Icons.ADD,
-        icon_color=ft.Colors.GREEN,
-        #on_click=incrementa_click
-    )
-    riga_testo_inserimento_strumento = ft.Row([testo_tipo, testo_marca, testo_anno,testo_meno, testo_piu])
-    page.controls.append(riga_testo_inserimento_strumento)
-
-    page.update()
-
-
+    testo_tipo = ft.TextField(label="Tipo", width=200)
+    testo_marca = ft.TextField(label="Marca", width=200)
+    testo_anno = ft.TextField(label="Anno acquisto", width=150)
+    contatore = ft.TextField(value="0", width=60, text_align=ft.TextAlign.CENTER, read_only=True)
 
     # --- FUNZIONI APP ---
     def aggiorna_lista_strumenti():
@@ -79,6 +63,51 @@ def main(page: ft.Page):
 
     # Handlers per la gestione dei pulsanti utili all'inserimento di un nuovo strumento
     # TODO
+    def diminuisci(e):
+        attuale = int(contatore.value)
+        if attuale > 0:
+            contatore.value = str(attuale - 1)
+            contatore.update()
+
+    def aumenta(e):
+        attuale = int(contatore.value)
+        contatore.value = str(attuale + 1)
+        contatore.update()
+
+    def aggiungi_nuovo_strumento(e):
+        tipo = testo_tipo.value.strip()
+        marca = testo_marca.value.strip()
+        anno_str = testo_anno.value.strip()
+        valore_str = contatore.value.strip()
+
+        if not tipo or not marca:
+            alert.show_alert("Descrizione dell'errore: Inserire tipo e marca validi.")
+            return
+
+        try:
+            anno = int(anno_str)
+        except ValueError:
+            alert.show_alert("Descrizione dell'errore: Valore non numerico per il campo anno.")
+            return
+
+        try:
+            valore = int(valore_str)
+            if valore <= 0:
+                alert.show_alert("Descrizione dell'errore: Inserire un valore in euro maggiore di zero.")
+                return
+        except ValueError:
+            alert.show_alert("Descrizione dell'errore: Valore dello strumento non valido.")
+            return
+
+        deposito.aggiungi_strumento(tipo, marca, anno, valore)
+
+        testo_tipo.value = ""
+        testo_marca.value = ""
+        testo_anno.value = ""
+        contatore.value = "0"
+
+        aggiorna_lista_strumenti()
+        page.update()
 
     # --- EVENTI ---
     toggle_cambia_tema = ft.Switch(label="Tema scuro", value=True, on_change=cambia_tema)
@@ -86,6 +115,9 @@ def main(page: ft.Page):
 
     # Pulsanti per la gestione dell'inserimento di un nuovo strumento
     # TODO
+    btn_meno = ft.IconButton(icon=ft.Icons.REMOVE, icon_color=ft.Colors.RED, on_click=diminuisci)
+    btn_piu = ft.IconButton(icon=ft.Icons.ADD, icon_color=ft.Colors.GREEN, on_click=aumenta)
+    pulsante_aggiungi = ft.ElevatedButton("Aggiungi strumento", on_click=aggiungi_nuovo_strumento)
 
     # --- LAYOUT ---
     page.add(
@@ -104,6 +136,18 @@ def main(page: ft.Page):
 
         # Sezione 3
         # TODO
+        ft.Divider(),
+        ft.Text("Aggiungi nuovo strumento", size=20),
+        ft.Row(
+            controls=[
+                testo_tipo,
+                testo_marca,
+                testo_anno,
+                ft.Row([btn_meno, contatore, btn_piu], alignment=ft.MainAxisAlignment.CENTER)
+            ],
+            alignment=ft.MainAxisAlignment.CENTER
+        ),
+        ft.Row([pulsante_aggiungi], alignment=ft.MainAxisAlignment.CENTER),
 
         # Sezione 4
         ft.Divider(),
